@@ -3,9 +3,9 @@ import os
 from os import walk
 from os.path import exists, join, relpath
 
-source_folder_path = "C:/Users/yop/Desktop/w/assingments/Veeam/source"
-replica_folder_path = "C:/Users/yop/Desktop/w/assingments/Veeam/replica"
-logging_file_path = "C:/Users/yop/Desktop/w/assingments/Veeam/logging.log"
+source_folder_path = "C:/Users/yop/Desktop/w/assingments/Veeam/veeam_qa/source"
+replica_folder_path = "C:/Users/yop/Desktop/w/assingments/Veeam/veeam_qa/replica"
+logging_file_path = "C:/Users/yop/Desktop/w/assingments/Veeam/veeam_qa/logging.log"
 
 def checksum_file(file_name):
     with open(file_name, 'rb') as file_to_check:
