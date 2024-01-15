@@ -96,3 +96,13 @@ def delete_invalid_files_from_replica(replica_folder_path, folders_to_delete, fi
             replica_folder = join(replica_folder_path, elem[0])
             remove_folder(replica_folder)
             print(f'Deleted: {replica_folder}')
+
+def main():
+    folders_to_create, files_to_create = operational_tree(source_folder_path, replica_folder_path)
+    folders_to_delete, files_to_delete = operational_tree(replica_folder_path, source_folder_path, False)
+
+    copy_all_files_from_source(source_folder_path, replica_folder_path, folders_to_create, files_to_create)
+    delete_invalid_files_from_replica(replica_folder_path, folders_to_delete, files_to_delete)
+
+if __name__ == "__main__":
+    main()
