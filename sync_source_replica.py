@@ -20,3 +20,12 @@ def create_file(source_file_path, replica_file_path, buffer_size=1024):
                 if not buffer_data:
                     break
                 replica_file.write(buffer_data)
+
+def create_folder(folder_path):
+    os.mkdir(folder_path)
+
+def remove_file(file_path):
+    os.remove(file_path)
+
+def remove_folder(folder_path):
+    os.rmdir(folder_path)
