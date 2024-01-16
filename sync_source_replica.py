@@ -1,11 +1,35 @@
+import colorlog
 import hashlib
+import logging
 import os
+from json_formatter import formatter
 from os import walk
 from os.path import exists, join, relpath
+import sys
+
 
 source_folder_path = "C:/Users/yop/Desktop/w/assingments/Veeam/veeam_qa/source"
 replica_folder_path = "C:/Users/yop/Desktop/w/assingments/Veeam/veeam_qa/replica"
 logging_file_path = "C:/Users/yop/Desktop/w/assingments/Veeam/veeam_qa/logging.log"
+logger = logging.getLogger(__name__)
+
+# Color handler to console
+stdout = colorlog.StreamHandler(stream=sys.stdout)
+fmt = colorlog.ColoredFormatter(
+    "%(name)s: %(white)s%(asctime)s%(reset)s | %(log_color)s%(levelname)s%(reset)s | %(blue)s%(filename)s:%(lineno)s%(reset)s | %(process)d >>> %(log_color)s%(message)s%(reset)s"
+)
+stdout.setFormatter(fmt)
+stdout.setLevel(logging.INFO)
+logger.addHandler(stdout)
+
+# Json handler to file
+logHandler = logging.FileHandler(logging_file_path)
+logHandler.setFormatter(formatter)
+logHandler.setLevel(logging.INFO)
+logger.addHandler(logHandler)
+
+logger.setLevel(logging.INFO)
+
 
 def checksum_file(file_name):
     with open(file_name, 'rb') as file_to_check:
