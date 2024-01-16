@@ -19,13 +19,12 @@ fmt = colorlog.ColoredFormatter(
     "%(name)s: %(white)s%(asctime)s%(reset)s | %(log_color)s%(levelname)s%(reset)s | %(blue)s%(filename)s:%(lineno)s%(reset)s | %(process)d >>> %(log_color)s%(message)s%(reset)s"
 )
 stdout.setFormatter(fmt)
-stdout.setLevel(logging.INFO)
 logger.addHandler(stdout)
 
 # Json handler to file
 logHandler = logging.FileHandler(logging_file_path)
 logHandler.setFormatter(formatter)
-logHandler.setLevel(logging.INFO)
+logHandler.setLevel(logging.WARNING)
 logger.addHandler(logHandler)
 
 logger.setLevel(logging.INFO)
@@ -46,11 +45,14 @@ def create_file(source_file_path, replica_file_path, buffer_size=1024):
                     break
                 replica_file.write(buffer_data)
 
+
 def create_folder(folder_path):
     os.mkdir(folder_path)
 
+
 def remove_file(file_path):
     os.remove(file_path)
+
 
 def remove_folder(folder_path):
     os.rmdir(folder_path)
@@ -82,6 +84,7 @@ def operational_tree(source_folder_path, replica_folder_path, topdown=True):
                 files_dictionary[relative_path_to_file] = False
     
     return folder_dictionary, files_dictionary
+
 
 def copy_all_files_from_source(source_folder_path, replica_folder_path, folders_to_create, files_to_create):
     for elem in folders_to_create.items():
@@ -121,12 +124,14 @@ def delete_invalid_files_from_replica(replica_folder_path, folders_to_delete, fi
             remove_folder(replica_folder)
             print(f'Deleted: {replica_folder}')
 
+
 def main():
     folders_to_create, files_to_create = operational_tree(source_folder_path, replica_folder_path)
     folders_to_delete, files_to_delete = operational_tree(replica_folder_path, source_folder_path, False)
 
     copy_all_files_from_source(source_folder_path, replica_folder_path, folders_to_create, files_to_create)
     delete_invalid_files_from_replica(replica_folder_path, folders_to_delete, files_to_delete)
+
 
 if __name__ == "__main__":
     main()
