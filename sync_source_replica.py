@@ -2,10 +2,12 @@ import colorlog
 import hashlib
 import logging
 import os
+from apscheduler.schedulers.background import BackgroundScheduler
 from json_formatter import formatter
 from os import walk
 from os.path import exists, join, relpath
 import sys
+import time
 
 
 logger = logging.getLogger(__name__)
@@ -172,25 +174,34 @@ def delete_invalid_files_from_replica(replica_folder_path, folders_to_delete, fi
 
 
 def main():
-    logger.info(f'Syncronization process started')
-    if not exists(source_folder_path) or not exists(replica_folder_path):
-        logger.critical('Source or replica paths do not exist')
-        raise FileNotFoundError('Source or replica paths do not exist')
-    
-    folders_to_create, files_to_create = operational_tree(source_folder_path, replica_folder_path)
-    folders_to_delete, files_to_delete = operational_tree(replica_folder_path, source_folder_path)
-    logger.info(f'Dictionaries to create and delete files and folders done')
+    try:
+        logger.info(f'Syncronization process started')
+        if not exists(source_folder_path) or not exists(replica_folder_path):
+            logger.critical('Source or replica paths do not exist')
+            raise FileNotFoundError('Source or replica paths do not exist')
+        
+        folders_to_create, files_to_create = operational_tree(source_folder_path, replica_folder_path)
+        folders_to_delete, files_to_delete = operational_tree(replica_folder_path, source_folder_path)
+        logger.info(f'Dictionaries to create and delete files and folders done')
 
-    copy_all_files_from_source(source_folder_path, replica_folder_path, folders_to_create, files_to_create)
-    logger.info(f'Files and folders created done')
+        copy_all_files_from_source(source_folder_path, replica_folder_path, folders_to_create, files_to_create)
+        logger.info(f'Files and folders created done')
 
-    delete_invalid_files_from_replica(replica_folder_path, folders_to_delete, files_to_delete)
-    logger.info(f'Files and folders deleted done')
-    logger.info(f'Syncronization process finished')
+        delete_invalid_files_from_replica(replica_folder_path, folders_to_delete, files_to_delete)
+        logger.info(f'Files and folders deleted done')
+        logger.info(f'Syncronization process finished')
+    except Exception as e:
+        logger.critical(f'Syncronization process did not finished. Replica folder not synchronized. Error:\n{e}')
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception as e:
-        logger.critical(f'Syncronization process did not finished. Replica folder not synchronized. Error:\n{e}')
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(main, 'interval', seconds=sync_period)
+    scheduler.start()
+    while True:  # keeping thread alive
+        try:
+            time.sleep(2)
+        except (KeyboardInterrupt, SystemExit):
+            scheduler.shutdown()
+            break
+
