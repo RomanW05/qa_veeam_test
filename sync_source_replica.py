@@ -140,12 +140,14 @@ def operational_tree(source_folder_path, replica_folder_path, topdown=True):
     return folder_dictionary, files_dictionary
 
 
-def copy_all_files_from_source(source_folder_path, replica_folder_path, folders_to_create, files_to_create):
+def copy_all_folders_from_source(replica_folder_path, folders_to_create):
     for elem in folders_to_create.items():
         replica_folder = join(replica_folder_path, elem[0])
         if not exists(replica_folder):
             create_folder(replica_folder)
 
+
+def copy_all_files_from_source(source_folder_path, replica_folder_path, files_to_create):
     for elem in files_to_create.items():
         source_file = join(source_folder_path, elem[0])
         replica_file = join(replica_folder_path, elem[0])
@@ -161,12 +163,14 @@ def copy_all_files_from_source(source_folder_path, replica_folder_path, folders_
             create_file(source_file, replica_file)
 
 
-def delete_invalid_files_from_replica(replica_folder_path, folders_to_delete, files_to_delete):
+def delete_invalid_files_from_replica(replica_folder_path, files_to_delete):
     for elem in files_to_delete.items():
         if not elem[1]:
             replica_file = join(replica_folder_path, elem[0])
             remove_file(replica_file)
 
+
+def delete_invalid_folders_from_replica(replica_folder_path, folders_to_delete):
     for elem in folders_to_delete.items():
         if not elem[1]:
             replica_folder = join(replica_folder_path, elem[0])
@@ -181,14 +185,21 @@ def main():
             raise FileNotFoundError('Source or replica paths do not exist')
         
         folders_to_create, files_to_create = operational_tree(source_folder_path, replica_folder_path)
-        folders_to_delete, files_to_delete = operational_tree(replica_folder_path, source_folder_path)
+        folders_to_delete, files_to_delete = operational_tree(replica_folder_path, source_folder_path, False)
         logger.info(f'Dictionaries to create and delete files and folders done')
 
+        copy_all_folders_from_source(replica_folder_path, folders_to_create)
+        logger.info(f'Folders created done')
+
         copy_all_files_from_source(source_folder_path, replica_folder_path, folders_to_create, files_to_create)
-        logger.info(f'Files and folders created done')
+        logger.info(f'Files created done')
 
         delete_invalid_files_from_replica(replica_folder_path, folders_to_delete, files_to_delete)
-        logger.info(f'Files and folders deleted done')
+        logger.info(f'Files deleted done')
+
+        delete_invalid_folders_from_replica(replica_folder_path, folders_to_delete)
+        logger.info(f'Folders deleted done')
+        
         logger.info(f'Syncronization process finished')
     except Exception as e:
         logger.critical(f'Syncronization process did not finished. Replica folder not synchronized. Error:\n{e}')
