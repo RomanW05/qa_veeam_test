@@ -8,11 +8,6 @@ from os.path import exists, join, relpath
 import sys
 
 
-
-source_folder_path = "C:/Users/yop/Desktop/w/assingments/Veeam/veeam_qa/source"
-replica_folder_path = "C:/Users/yop/Desktop/w/assingments/Veeam/veeam_qa/replica"
-logging_file_path = "C:/Users/yop/Desktop/w/assingments/Veeam/veeam_qa/logging.log"
-
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
@@ -25,11 +20,31 @@ fmt = colorlog.ColoredFormatter(
 stdout.setFormatter(fmt)
 logger.addHandler(stdout)
 
+try:
+    logging_file_path = "C:/Users/yop/Desktop/w/assingments/Veeam/veeam_qa/logging.log"
+    logging_file_path = sys.argv[4]
+except IndexError as e:
+    logger.critical(f'Logging file path or not enough arguments not provided when initializing module {__name__}. Error:\n{e}')
+    sys.exit(2)  # Missing arguments
+
 # Json handler to file
 logHandler = logging.FileHandler(logging_file_path)
 logHandler.setFormatter(formatter)
 logHandler.setLevel(logging.WARNING)
 logger.addHandler(logHandler)
+
+try:
+    source_folder_path = "C:/Users/yop/Desktop/w/assingments/Veeam/veeam_qa/source"
+    replica_folder_path = "C:/Users/yop/Desktop/w/assingments/Veeam/veeam_qa/replica"
+    source_folder_path = str(sys.argv[1])
+    replica_folder_path = str(sys.argv[2])
+    sync_period = int(sys.argv[3])  # In seconds
+except IndexError as e:
+    logger.critical(f'Not enough arguments were provided when initializing module {__name__}. Error:\n{e}')
+    sys.exit(2)
+except ValueError as e:
+    logger.critical(f'The synchronization periodicity argument provided when initializing module {__name__}, is not a number. Error:\n{e}')
+    sys.exit(2)
 
 
 def checksum_file(file_path):
