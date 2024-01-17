@@ -191,10 +191,10 @@ def main():
         copy_all_folders_from_source(replica_folder_path, folders_to_create)
         logger.info(f'Folders created done')
 
-        copy_all_files_from_source(source_folder_path, replica_folder_path, folders_to_create, files_to_create)
+        copy_all_files_from_source(source_folder_path, replica_folder_path, files_to_create)
         logger.info(f'Files created done')
 
-        delete_invalid_files_from_replica(replica_folder_path, folders_to_delete, files_to_delete)
+        delete_invalid_files_from_replica(replica_folder_path, files_to_delete)
         logger.info(f'Files deleted done')
 
         delete_invalid_folders_from_replica(replica_folder_path, folders_to_delete)
