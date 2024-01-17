@@ -10,5 +10,7 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
             log_record['level'] = log_record['level'].upper()
         else:
             log_record['level'] = record.levelname
+        log_record['function'] = record.funcName
+        log_record['line'] = record.lineno
 
-formatter = CustomJsonFormatter('%(timestamp)s %(level)s %(name)s %(message)s')
+formatter = CustomJsonFormatter('%(timestamp)s %(level)s %(name)s %(function)s %(line)s %(message)s')
